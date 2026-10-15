@@ -207,11 +207,16 @@ function teclaNaOpcao(e, card) {
     toggleEtapa(card);
 }
 
+/* Casas decimais aceitas em cada campo. */
+const CASAS_APROVACAO = 2;
+const CASAS_PROFICIENCIA = 4;
+const CASAS_POR_EXTENSO = { 2: 'duas', 4: 'quatro' };
+
 /**
- * Le um campo numerico com ate duas casas decimais. Devolve { valor } ou
+ * Le um campo numerico com ate `casas` casas decimais. Devolve { valor } ou
  * { msg } com o motivo da recusa.
  */
-function lerNumero(input, nomeCampo, min, max) {
+function lerNumero(input, nomeCampo, min, max, casas) {
     const texto = input.value.trim();
     if (texto === '') {
         // Campo com texto invalido (ex.: letras) chega vazio: validity diferencia.
@@ -220,8 +225,8 @@ function lerNumero(input, nomeCampo, min, max) {
             : `Preencha o campo ${nomeCampo}.` };
     }
     const valor = Number(texto);
-    if (!/^\d+(\.\d{1,2})?$/.test(texto) || valor < min || valor > max) {
-        return { msg: `${nomeCampo}: informe um valor de ${formatar(min, 2)} a ${formatar(max, 2)}, com até duas casas decimais.` };
+    if (!new RegExp(`^\\d+(\\.\\d{1,${casas}})?$`).test(texto) || valor < min || valor > max) {
+        return { msg: `${nomeCampo}: informe um valor de ${formatar(min, 2)} a ${formatar(max, 2)}, com até ${CASAS_POR_EXTENSO[casas]} casas decimais.` };
     }
     return { valor };
 }
@@ -245,7 +250,7 @@ function lerEtapa(chave) {
             aprovacoes.push(null);
             return;
         }
-        const taxa = lerNumero(input, `Aprovação (${ano}) ${de}`, APROVACAO_MIN, APROVACAO_MAX);
+        const taxa = lerNumero(input, `Aprovação (${ano}) ${de}`, APROVACAO_MIN, APROVACAO_MAX, CASAS_APROVACAO);
         if (taxa.msg) erros.push({ alvo: input, msg: taxa.msg });
         aprovacoes.push(taxa.valor);
     });
@@ -254,9 +259,9 @@ function lerEtapa(chave) {
     }
 
     const limites = LIMITES_SAEPE[chave];
-    const lp = lerNumero(campo('lp'), `Proficiência em Língua Portuguesa ${de}`, limites.lp.inf, limites.lp.sup);
+    const lp = lerNumero(campo('lp'), `Proficiência em Língua Portuguesa ${de}`, limites.lp.inf, limites.lp.sup, CASAS_PROFICIENCIA);
     if (lp.msg) erros.push({ alvo: campo('lp'), msg: lp.msg });
-    const mt = lerNumero(campo('mt'), `Proficiência em Matemática ${de}`, limites.mt.inf, limites.mt.sup);
+    const mt = lerNumero(campo('mt'), `Proficiência em Matemática ${de}`, limites.mt.inf, limites.mt.sup, CASAS_PROFICIENCIA);
     if (mt.msg) erros.push({ alvo: campo('mt'), msg: mt.msg });
 
     if (erros.length > 0) return { dados: null, erros };
@@ -304,12 +309,14 @@ function formatar(valor, casas) {
     return arredondar(valor, casas).toFixed(casas).replace('.', ',');
 }
 
-/* Taxa como aparece no resumo. Abaixo de 65% mostra com quanto entra na conta. */
+/* Taxa como aparece no resumo. */
 function descreverTaxa(taxa) {
-    if (taxa === null) return 'em branco';
-    const digitada = `${formatar(taxa, 2)}%`;
-    const considerada = taxaConsiderada(taxa);
-    return considerada === taxa ? digitada : `${digitada} (conta ${formatar(considerada, 2)}%)`;
+    return taxa === null ? 'em branco' : `${formatar(taxa, 2)}%`;
+}
+
+/* Proficiencia como foi digitada: de duas a quatro casas. */
+function descreverProficiencia(valor) {
+    return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: CASAS_PROFICIENCIA });
 }
 
 function montarResumo() {
@@ -326,7 +333,7 @@ function montarResumo() {
                 <strong class="etapa-nome etapa-${chave}">${NOME_ETAPA[chave]}</strong>
                 <ul>
                     <li>Aprovação — ${aprovacoes}</li>
-                    <li>SAEPE — Língua Portuguesa: ${formatar(dados.lp, 2)} · Matemática: ${formatar(dados.mt, 2)}</li>
+                    <li>SAEPE — Língua Portuguesa: ${descreverProficiencia(dados.lp)} · Matemática: ${descreverProficiencia(dados.mt)}</li>
                 </ul>
             </div>`;
     });

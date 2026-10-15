@@ -775,6 +775,13 @@ body {
 .grade-aprovacoes.com-erro .input-campo input { border-color: var(--vermelho); }
 .grade-aprovacoes > .erro-campo { grid-column: 1 / -1; margin-top: 0; }
 
+/* Nome da disciplina sublinhado nos rotulos das proficiencias */
+.disciplina {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
 /* Resumo: uma caixa por etapa com o que foi digitado */
 .resumo-etapa {
     padding: 12px 14px;
