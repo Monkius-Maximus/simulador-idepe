@@ -372,6 +372,11 @@ function mostrarResultado() {
                 </div>
                 <strong class="etapa-nome etapa-${chave}">${NOME_ETAPA[chave]}</strong>
                 <p class="selo-conta">Aprendizado (N) ${formatar(r.nota_saepe, 2)}<br>× Fluxo (P) ${formatar(r.rendimento, 2)}</p>
+                <div class="selo-notas">
+                    <span class="selo-notas-titulo">Notas padronizadas</span>
+                    <span class="selo-nota"><span class="disciplina">Língua Portuguesa</span> <strong>${formatar(r.nota_lp, 2)}</strong></span>
+                    <span class="selo-nota"><span class="disciplina">Matemática</span> <strong>${formatar(r.nota_mt, 2)}</strong></span>
+                </div>
             </div>`;
     }).join('');
 
