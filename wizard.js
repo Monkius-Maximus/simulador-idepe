@@ -215,17 +215,16 @@ const CASAS_POR_EXTENSO = { 2: 'duas', 4: 'quatro' };
 /**
  * Le um campo numerico com ate `casas` casas decimais. Devolve { valor } ou
  * { msg } com o motivo da recusa.
+ *
+ * O campo e de texto, e quem le o numero e o simulador: o campo numerico do
+ * navegador trata a virgula de um jeito em cada navegador, e ha navegador que
+ * a apaga ("9,5" virava 95). Aceita virgula ou ponto como separador decimal.
  */
 function lerNumero(input, nomeCampo, min, max, casas) {
     const texto = input.value.trim();
-    if (texto === '') {
-        // Campo com texto invalido (ex.: letras) chega vazio: validity diferencia.
-        return { msg: input.validity.badInput
-            ? `O campo ${nomeCampo} tem um valor inválido. Use apenas números.`
-            : `Preencha o campo ${nomeCampo}.` };
-    }
-    const valor = Number(texto);
-    if (!new RegExp(`^\\d+(\\.\\d{1,${casas}})?$`).test(texto) || valor < min || valor > max) {
+    if (texto === '') return { msg: `Preencha o campo ${nomeCampo}.` };
+    const valor = Number(texto.replace(',', '.'));
+    if (!new RegExp(`^\\d+([.,]\\d{1,${casas}})?$`).test(texto) || valor < min || valor > max) {
         return { msg: `${nomeCampo}: informe um valor de ${formatar(min, 2)} a ${formatar(max, 2)}, com até ${CASAS_POR_EXTENSO[casas]} casas decimais.` };
     }
     return { valor };
@@ -246,7 +245,7 @@ function lerEtapa(chave) {
     const aprovacoes = [];
     ANOS_DA_ETAPA[chave].forEach((ano, i) => {
         const input = campo(`ap-${i + 1}`);
-        if (input.value.trim() === '' && !input.validity.badInput) {
+        if (input.value.trim() === '') {
             aprovacoes.push(null);
             return;
         }
