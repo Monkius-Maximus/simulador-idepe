@@ -332,7 +332,7 @@ function montarResumo() {
                 <strong class="etapa-nome etapa-${chave}">${NOME_ETAPA[chave]}</strong>
                 <ul>
                     <li>Aprovação — ${aprovacoes}</li>
-                    <li>SAEPE — Língua Portuguesa: ${descreverProficiencia(dados.lp)} · Matemática: ${descreverProficiencia(dados.mt)}</li>
+                    <li>SAEPE — <span class="disc disc-lp" title="Língua Portuguesa">LP</span>${descreverProficiencia(dados.lp)} · <span class="disc disc-mt" title="Matemática">MAT</span>${descreverProficiencia(dados.mt)}</li>
                 </ul>
             </div>`;
     });
@@ -373,8 +373,10 @@ function mostrarResultado() {
                 <p class="selo-conta">Aprendizado (N) ${formatar(r.nota_saepe, 2)}<br>× Fluxo (P) ${formatar(r.rendimento, 2)}</p>
                 <div class="selo-notas">
                     <span class="selo-notas-titulo">Notas padronizadas</span>
-                    <span class="selo-nota"><span class="disciplina">Língua Portuguesa</span> <strong>${formatar(r.nota_lp, 2)}</strong></span>
-                    <span class="selo-nota"><span class="disciplina">Matemática</span> <strong>${formatar(r.nota_mt, 2)}</strong></span>
+                    <div class="selo-notas-colunas">
+                        <span class="selo-nota" aria-label="Língua Portuguesa: ${formatar(r.nota_lp, 2)}"><span class="disc disc-lp" title="Língua Portuguesa">LP</span><strong>${formatar(r.nota_lp, 2)}</strong></span>
+                        <span class="selo-nota" aria-label="Matemática: ${formatar(r.nota_mt, 2)}"><span class="disc disc-mt" title="Matemática">MAT</span><strong>${formatar(r.nota_mt, 2)}</strong></span>
+                    </div>
                 </div>
             </div>`;
     }).join('');
